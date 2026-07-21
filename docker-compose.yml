@@ -35,7 +35,7 @@ services:
       - timesaver-network
     volumes:
       # Persistência do banco SQLite
-      - sqlite-data:/app/database
+      - sqlite-data:/app/instance
     restart: unless-stopped
 
 networks:
