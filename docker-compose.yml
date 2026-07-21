@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  # Servicio 1: API Mock de Agendamentos Médicos
+  mock-api:
+    build:
+      context: ./mock_api
+      dockerfile: Dockerfile
+    container_name: timesaver_mock_api
+    ports:
+      - "5001:5001"
+    environment:
+      - PORT=5001
+      - FLASK_ENV=development
+    networks:
+      - timesaver-network
+    restart: unless-stopped
+
+  # Serviço 2: Aplicação Web Principal (Flask + SQLite + Tabulator.js)
+  web:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    container_name: timesaver_web_app
+    ports:
+      - "5000:5000"
+    environment:
+      - PORT=5000
+      - FLASK_ENV=development
+      - MOCK_API_URL=http://mock-api:5001/api/agendamentos
+      - SECRET_KEY=timesaver-secret-key-2026
+    depends_on:
+      - mock-api
+    networks:
+      - timesaver-network
+    volumes:
+      # Persistência do banco SQLite
+      - sqlite-data:/app/database
+    restart: unless-stopped
+
+networks:
+  timesaver-network:
+    driver: bridge
+
+volumes:
+  sqlite-data:
