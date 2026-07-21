@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual Environments
+.venv
+venv
+
+# Environment variables
+# Não versionar segredos e configurações de ambiente.
+.env*
+
+# Test & Coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# IDE & Editor Folders
+.vscode/
+.idea/
+
+# Database Files
+# O banco de dados de desenvolvimento não deve ser versionado.
+*.sqlite
+*.sqlite3
+instance/

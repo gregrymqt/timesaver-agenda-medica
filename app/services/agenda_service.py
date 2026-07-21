@@ -1,47 +1,41 @@
-import requests
+import httpx
 import os
 
 class AgendaService:
-    def __int__(self):
+    def __init__(self):
         self.mock_api_url = os.environ.get(
-                'MOCK_API_URL', 
+                'MOCK_API_URL',
                 'http://mock-api:5001/api/agendamentos'
             )
-        
+        # Reutiliza o cliente HTTP para manter um pool de conexões, melhorando a performance.
+        # Evita o custo de estabelecer uma nova conexão TCP/TLS para cada requisição.
+        self._client = httpx.AsyncClient(timeout=3.0)
+
     async def get_agendamentos(self):
         """
         Consome a API de agendamentos com tratamento de erros e timeout.
         Evita que falhas na API externa derrubem o front-end.
-        """    
-        
+        """
         try:
-            
-            response = await requests.get(self.mock_api_url, timeout=3.0)
-            
-            if response.status_code == 200:
-                return{
-                    "success":True,
-                    "data": response.json(),
-                    "error": None
-                } 
-                
+            response = await self._client.get(self.mock_api_url)
+            response.raise_for_status()  # Lança exceção para status 4xx ou 5xx
+
             return {
-                    "success": False, 
-                    "data": [], 
-                    "error": f"API de agendamentos respondeu com status {response.status_code}"
-                }
-        
-        except requests.Exception.TimeoutError as e:
-            return{
-                "success":False,
-                "data":[],
+                "success": True,
+                "data": response.json(),
+                "error": None
+            }
+
+        except httpx.TimeoutException as e:
+            return {
+                "success": False,
+                "data": [],
                 "error": "Tempo limite excedido ao conectar à API de agendamentos (Timeout)."
             }
-            
-        except requests.exceptions.RequestException as e:
+
+        except httpx.RequestError as e:
             return {
                 "success": False, 
                 "data": [], 
-                "error": "Não foi possível conectar ao serviço de agendamentos."
+                "error": f"Não foi possível conectar ao serviço de agendamentos: {e.__class__.__name__}"
             }
-    

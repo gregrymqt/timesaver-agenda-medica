@@ -19,8 +19,8 @@ services:
   # Serviço 2: Aplicação Web Principal (Flask + SQLite + Tabulator.js)
   web:
     build:
-      context: ./app
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: app/Dockerfile
     container_name: timesaver_web_app
     ports:
       - "5000:5000"

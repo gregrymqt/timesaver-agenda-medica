@@ -3,7 +3,8 @@ import os
 from app.database.db import get_db
 from werkzeug.security import generate_password_hash
 
-class DBConfig():
+class DBInit():
+    @staticmethod
     def init_db():
         """Cria as tabelas e popula o usuário inicial caso o banco não exista."""
         # Conecta ao banco (o SQLite cria o arquivo .sqlite automaticamente se não existir)
@@ -42,9 +43,6 @@ class DBConfig():
             print(f"✅ Banco de dados inicializado com sucesso! Usuário criado: {email_admin}")
         else:
             print("ℹ️ Banco de dados já inicializado.")
-
-        # Fecha a conexão com o banco
-        conn.close()
 
     if __name__ == '__main__':
         init_db()
