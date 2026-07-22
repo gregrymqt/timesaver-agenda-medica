@@ -74,7 +74,7 @@ desafio_time_saver/
 
 1. **Clone o repositório:**
    ```bash
-   git clone (https://github.com/gregrymqt/timesaver-agenda-medica)
+   git clone https://github.com/gregrymqt/timesaver-agenda-medica
    cd desafio_time_saver
    ```
 
