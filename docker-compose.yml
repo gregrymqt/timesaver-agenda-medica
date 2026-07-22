@@ -1,11 +1,10 @@
-version: '3.8'
 
 services:
   # Servicio 1: API Mock de Agendamentos Médicos
   mock-api:
     build:
-      context: ./mock_api
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: mock_api/Dockerfile
     container_name: timesaver_mock_api
     ports:
       - "5001:5001"

@@ -1,27 +1,54 @@
+# Stage 1: Builder - Instala as dependências em um ambiente temporário
+FROM python:3.11-slim as builder
+
+# Variáveis de ambiente para otimização e boas práticas
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+# Instala pacotes no diretório home do usuário, facilitando a cópia entre estágios
+ENV PIP_USER=true
+
+WORKDIR /app
+
+# Instala dependências de sistema necessárias para compilar alguns pacotes Python
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copia e instala as dependências Python. O contexto do build é a raiz do projeto.
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r ../requirements.txt
+
+# ---
+
+# Stage 2: Runner - A imagem final, leve e segura
 FROM python:3.11-slim
 
-# Evita gravação de arquivos .pyc no container e habilita log direto no stdout
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-# Instala dependências do sistema necessárias
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
+# Cria um usuário não-root por segurança
+RUN addgroup --system nonroot && adduser --system --ingroup nonroot nonroot
 
-# Copia e instala as dependências Python
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# Copia os pacotes instalados do estágio 'builder'
+COPY --from=builder /root/.local /home/nonroot/.local
 
-# Copia o código da aplicação
-COPY . .
+# Copia apenas o código da aplicação (o conteúdo da pasta 'app') para o WORKDIR
+COPY app/ .
 
-# Garante a existência do diretório do banco de dados
-RUN mkdir -p /app/database
+# Cria o diretório para o banco de dados SQLite e dá a posse ao usuário não-root
+RUN mkdir -p /app/instance && chown -R nonroot:nonroot /app/instance
+
+# Adiciona o diretório de binários do usuário ao PATH (onde o gunicorn foi instalado)
+ENV PATH=/home/nonroot/.local/bin:$PATH
+
+# Troca para o usuário não-root
+USER nonroot
 
 EXPOSE 5000
 
-CMD ["python", "main.py"]
+
+# Usa Gunicorn como servidor WSGI de produção, que é mais robusto que o servidor de desenvolvimento do Flask
+CMD ["gunicorn", "--workers", "4", "--bind", "0.0.0.0:5000", "main:app"]
+
