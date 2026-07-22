@@ -48,6 +48,5 @@ USER nonroot
 
 EXPOSE 5001
 
-
 # Usa Gunicorn como servidor WSGI de produção.
 CMD ["gunicorn", "--workers", "2", "--bind", "0.0.0.0:5001", "app:app"]
