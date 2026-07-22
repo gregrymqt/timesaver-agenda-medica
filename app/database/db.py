@@ -25,6 +25,7 @@ def init_app(app: Flask):
     """Registra os hooks de gerenciamento do banco no ciclo de vida do Flask."""
     # Define o caminho padrão do banco se não estiver em modo de teste
     if not app.config.get('TESTING'):
+        os.makedirs(app.instance_path, exist_ok=True)
         app.config.setdefault('DATABASE', os.path.join(app.instance_path, 'db.sqlite'))
 
     app.teardown_appcontext(close_db)

@@ -52,6 +52,6 @@ USER nonroot
 EXPOSE 5000
 
 
-# Usa Gunicorn com workers Uvicorn para suportar rotas 'async' que usam 'await'
-# O UvicornWorker é compatível com o objeto 'app' do Flask (versão 2.0+), que suporta ASGI nativamente.
-CMD ["gunicorn", "--workers", "4", "--worker-class", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:5000", "main:app"]
+# Usa Gunicorn como servidor WSGI de produção com worker 'gthread'.
+# O Flask suporta rotas 'async' nativamente via WSGI/asgiref sem necessitar do Uvicorn.
+CMD ["gunicorn", "--workers", "2", "--worker-class", "gthread", "--threads", "4", "--bind", "0.0.0.0:5000", "main:app"]

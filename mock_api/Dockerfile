@@ -50,5 +50,4 @@ EXPOSE 5001
 
 
 # Usa Gunicorn como servidor WSGI de produção.
-# O UvicornWorker é compatível com o objeto 'app' do Flask (versão 2.0+), que suporta ASGI nativamente.
-CMD ["gunicorn", "--workers", "2", "--worker-class", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:5001", "app:app"]
+CMD ["gunicorn", "--workers", "2", "--bind", "0.0.0.0:5001", "app:app"]

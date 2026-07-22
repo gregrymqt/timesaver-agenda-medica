@@ -1,5 +1,5 @@
 import pytest
-from unittest.mock import patch, AsyncMock
+from unittest.mock import patch, AsyncMock, MagicMock
 import httpx
 from app.services.agenda_service import AgendaService
 
@@ -13,7 +13,7 @@ async def test_agenda_service_sucesso():
     ]
 
     # Mock da resposta da API
-    mock_response = AsyncMock()
+    mock_response = MagicMock()
     mock_response.json.return_value = mock_data
     mock_response.raise_for_status.return_value = None
 
@@ -58,7 +58,7 @@ async def test_agenda_service_erro_conexao():
         assert "Não foi possível conectar" in result['error']
 
 def test_endpoint_api_agenda_protegido(client):
-    """Garante que a rota interna `/api/agenda` exige autenticação prévia."""
-    response = client.get('/api/agenda')
+    """Garante que a rota interna `/api/agendamentos` exige autenticação prévia."""
+    response = client.get('/api/agendamentos')
     assert response.status_code == 302
     assert '/login' in response.headers['Location']
