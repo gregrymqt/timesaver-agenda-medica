@@ -1,46 +1,26 @@
+import os
 from flask import Flask, jsonify
 from flask_cors import CORS
+
+MOCK_DATA = [
+    {"id": 1, "paciente": "Carlos Silva", "cpf": "111.222.333-44", "medico": "Dr. House", "especialidade": "Clínico Geral", "data_hora": "2026-08-10 14:30", "status": "Confirmado"},
+    {"id": 2, "paciente": "Maria Oliveira", "cpf": "222.333.444-55", "medico": "Dra. Grey", "especialidade": "Cardiologia", "data_hora": "2026-08-10 15:00", "status": "Pendente"},
+    {"id": 3, "paciente": "João Pereira", "cpf": "333.444.555-66", "medico": "Dr. Shepherd", "especialidade": "Neurologia", "data_hora": "2026-08-11 09:00", "status": "Cancelado"},
+    {"id": 4, "paciente": "Ana Souza", "cpf": "444.555.666-77", "medico": "Dr. House", "especialidade": "Clínico Geral", "data_hora": "2026-08-11 10:30", "status": "Confirmado"},
+    {"id": 5, "paciente": "Lucas Martins", "cpf": "555.666.777-88", "medico": "Dra. Yang", "especialidade": "Cirurgia", "data_hora": "2026-08-12 11:00", "status": "Confirmado"},
+]
 
 app = Flask(__name__)
 CORS(app)
 
-AGENDAMENTOS_MOCK = [
-    {
-        "id": 1,
-        "paciente": "Ana Silva",
-        "cpf": "123.456.789-00",
-        "medico": "Dr. Carlos Eduardo",
-        "especialidade": "Cardiologia",
-        "data_hora": "2026-07-25 09:00",
-        "status": "Confirmado"
-    },
-    {
-        "id": 2,
-        "paciente": "Bruno Costa",
-        "cpf": "987.654.321-11",
-        "medico": "Dra. Juliana Mendes",
-        "especialidade": "Dermatologia",
-        "data_hora": "2026-07-25 10:30",
-        "status": "Pendente"
-    },
-    {
-        "id": 3,
-        "paciente": "Carla Souza",
-        "cpf": "456.789.123-22",
-        "medico": "Dr. Carlos Eduardo",
-        "especialidade": "Cardiologia",
-        "data_hora": "2026-07-25 14:00",
-        "status": "Cancelado"
-    }
-]
-
-@app.route('/agendamentos', methods=['GET'])
+@app.route('/api/agendamentos', methods=['GET'])
 def get_agendamentos():
-    return jsonify(AGENDAMENTOS_MOCK), 200 
+    return  jsonify(MOCK_DATA), 200 
 
-@app.route('/health', methods=['GET'])
+@app.route('/api/health', methods=['GET'])
 def health_check():
     return jsonify({"status":"healthy", "service":"Mock API"}),200
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    port = int(os.environ.get('PORT', 5001))
+    app.run(host='0.0.0.0', port=port, debug=True)

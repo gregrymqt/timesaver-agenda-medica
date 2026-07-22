@@ -1,5 +1,5 @@
 from werkzeug.security import check_password_hash
-from app.repositories.user_repository import UserRepository
+from repositories.user_repository import UserRepository
 
 class AuthService:
     @staticmethod

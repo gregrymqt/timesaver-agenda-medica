@@ -1,6 +1,4 @@
-import sqlite3
-import os
-from app.database.db import get_db
+from database.db import get_db
 from werkzeug.security import generate_password_hash
 
 class DBInit():
@@ -22,27 +20,23 @@ class DBInit():
             )
         ''')
 
-        # 2. Verifica se já existe algum usuário cadastrado
-        cursor.execute('SELECT COUNT(*) FROM usuarios')
-        total_usuarios = cursor.fetchone()[0]
+        # 2. Insere o usuário padrão de forma atômica e segura para múltiplos processos.
+        # O 'INSERT OR IGNORE' tenta inserir, mas não faz nada (e não gera erro)
+        # se um registro com o mesmo 'email' (UNIQUE) já existir.
+        email_admin = "admin@timesaver.com"
+        senha_admin = "admin123"
+        senha_hash = generate_password_hash(senha_admin)
 
-        # 3. Se a tabela estiver vazia, insere o usuário padrão de teste
-        if total_usuarios == 0:
-            email_admin = "admin@timesaver.com"
-            senha_admin = "admin123"
-            
-            # Gera o hash seguro da senha
-            senha_hash = generate_password_hash(senha_admin)
+        cursor.execute('''
+            INSERT OR IGNORE INTO usuarios (email, senha_hash, nome)
+            VALUES (?, ?, ?)
+        ''', (email_admin, senha_hash, "Administrador TimeSaver"))
 
-            cursor.execute('''
-                INSERT INTO usuarios (email, senha_hash, nome)
-                VALUES (?, ?, ?)
-            ''', (email_admin, senha_hash, "Administrador TimeSaver"))
+        conn.commit()
 
-            conn.commit()
-            print(f"✅ Banco de dados inicializado com sucesso! Usuário criado: {email_admin}")
+        # A propriedade 'rowcount' do cursor nos diz se a última operação afetou alguma linha.
+        # Se for > 0, a inserção ocorreu. Se for 0, o usuário já existia.
+        if cursor.rowcount > 0:
+            print(f"✅ Banco de dados inicializado e usuário padrão criado: {email_admin}")
         else:
             print("ℹ️ Banco de dados já inicializado.")
-
-    if __name__ == '__main__':
-        init_db()

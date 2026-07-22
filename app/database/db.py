@@ -1,6 +1,6 @@
 import sqlite3
 import os
-from flask import g, current_app
+from flask import g, current_app, Flask
 
 def get_db():
     """
@@ -21,7 +21,7 @@ def close_db(e=None):
     if db is not None:
         db.close()
 
-def init_app(app):
+def init_app(app: Flask):
     """Registra os hooks de gerenciamento do banco no ciclo de vida do Flask."""
     # Define o caminho padrão do banco se não estiver em modo de teste
     if not app.config.get('TESTING'):

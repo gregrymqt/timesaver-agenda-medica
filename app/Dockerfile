@@ -1,5 +1,5 @@
 # Stage 1: Builder - Instala as dependências em um ambiente temporário
-FROM python:3.11-slim as builder
+FROM python:3.11-slim AS builder
 
 # Variáveis de ambiente para otimização e boas práticas
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -16,7 +16,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Copia e instala as dependências Python. O contexto do build é a raiz do projeto.
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r ../requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 # ---
 
@@ -43,12 +43,15 @@ RUN mkdir -p /app/instance && chown -R nonroot:nonroot /app/instance
 # Adiciona o diretório de binários do usuário ao PATH (onde o gunicorn foi instalado)
 ENV PATH=/home/nonroot/.local/bin:$PATH
 
+# Adiciona o diretório de pacotes do usuário ao PYTHONPATH para que o interpretador encontre os módulos
+ENV PYTHONPATH=/home/nonroot/.local/lib/python3.11/site-packages
+
 # Troca para o usuário não-root
 USER nonroot
 
 EXPOSE 5000
 
 
-# Usa Gunicorn como servidor WSGI de produção, que é mais robusto que o servidor de desenvolvimento do Flask
-CMD ["gunicorn", "--workers", "4", "--bind", "0.0.0.0:5000", "main:app"]
-
+# Usa Gunicorn com workers Uvicorn para suportar rotas 'async' que usam 'await'
+# O UvicornWorker é compatível com o objeto 'app' do Flask (versão 2.0+), que suporta ASGI nativamente.
+CMD ["gunicorn", "--workers", "4", "--worker-class", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:5000", "main:app"]

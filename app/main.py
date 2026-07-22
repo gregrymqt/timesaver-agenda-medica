@@ -2,10 +2,10 @@ import os
 from functools import wraps
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify, flash
 
-from app.database.db import init_app as init_db_app
-from app.database.seed import DBInit
-from app.services.auth_service import AuthService
-from app.services.agenda_service import AgendaService
+from database.db import init_app as init_db_app
+from database.seed import DBInit
+from services.auth_service import AuthService
+from services.agenda_service import AgendaService
 
 # 1. Inicializa a aplicação Flask
 app = Flask(__name__)
@@ -90,7 +90,7 @@ def dashboard():
     return render_template('index.html', user_nome=session.get('user_nome', 'Usuário'))
 
 
-@app.route('/api/agenda', methods=['GET'])
+@app.route('/api/agendamentos', methods=['GET'])
 @login_required
 async def api_agenda():
     """

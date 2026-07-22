@@ -1,0 +1,9 @@
+Flask==3.0.2
+Flask-CORS==4.0.0
+httpx==0.27.0
+werkzeug==3.0.1
+pytest==8.0.2
+pytest-flask==1.3.0
+gunicorn==21.2.0
+uvicorn==0.29.0
+asgiref

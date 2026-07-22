@@ -1,4 +1,4 @@
-from app.database.db import get_db
+from database.db import get_db
 
 class UserRepository:
     @staticmethod

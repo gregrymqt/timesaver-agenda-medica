@@ -68,7 +68,7 @@ document.addEventListener("DOMContentLoaded", () => {
     async function carregarAgenda() {
         try {
             // Executa a requisição HTTP GET usando Fetch com Await
-            const response = await fetch("/api/agenda");
+            const response = await fetch("/api/agendamentos");
 
             /** @type {ApiResponse} */
             const result = await response.json();
