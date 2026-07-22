@@ -87,7 +87,7 @@ document.addEventListener("DOMContentLoaded", () => {
             // Exibe mensagem amigável no alerta visual
             errorMessage.textContent = `⚠️ ${error.message}`;
             errorAlert.classList.remove("d-none");
-            table.setPlaceholder("Não foi possível carregar os dados.");
+            table.clearData();
         }
     }
 

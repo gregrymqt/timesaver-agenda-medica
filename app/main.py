@@ -1,4 +1,5 @@
 import os
+import inspect
 from functools import wraps
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify, flash
 
@@ -24,15 +25,24 @@ with app.app_context():
 agenda_service = AgendaService()
 
 
-# 2. Decorator Middleware para Proteção de Rotas
+# 2. Decorator Middleware para Proteção de Rotas (Suporta funções síncronas e assíncronas)
 def login_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if 'user_id' not in session:
-            flash("Sessão expirada ou não encontrada. Faça login para continuar.", "warning")
-            return redirect(url_for('login'))
-        return f(*args, **kwargs)
-    return decorated_function
+    if inspect.iscoroutinefunction(f):
+        @wraps(f)
+        async def decorated_function(*args, **kwargs):
+            if 'user_id' not in session:
+                flash("Sessão expirada ou não encontrada. Faça login para continuar.", "warning")
+                return redirect(url_for('login'))
+            return await f(*args, **kwargs)
+        return decorated_function
+    else:
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            if 'user_id' not in session:
+                flash("Sessão expirada ou não encontrada. Faça login para continuar.", "warning")
+                return redirect(url_for('login'))
+            return f(*args, **kwargs)
+        return decorated_function
 
 
 # 3. Definição das Rotas do Sistema
